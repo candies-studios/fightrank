@@ -1,0 +1,299 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   FIGHTRANK design system (§32)
+   Dark neutral foundation · white typography · one accent · movement colours
+   ========================================================================== */
+
+@theme {
+  /* Warriors Dream Series palette. Every component in the app is written
+     against these semantic names rather than raw hex, so re-pointing them here
+     restyles the whole site — the token names keep their old meanings:
+       ink-*   the dark surfaces, darkest first
+       line    hairline borders
+       chalk   primary text · muted / faint the quieter grades
+       signal  the single accent (WDS red)                                  */
+  --color-ink-900: #050505; /* page background          (--bg)     */
+  --color-ink-850: #0a0a0a;
+  --color-ink-800: #0d0d0d; /* raised surface           (--bg-alt) */
+  --color-ink-700: #111111; /* card                     (--card)   */
+  --color-ink-600: #1a1a1a;
+  --color-ink-500: #2a2a2a;
+  --color-line: #1f1f1f; /* border                   (--border) */
+  --color-line-soft: #171717;
+
+  /* The light header bar and the white offset card in the featured-event
+     showcase — the two places WDS goes light on a dark page. */
+  --color-bar: #e9e9ea;
+  --color-bar-line: #d6d6d6;
+  --color-bar-text: #111111;
+
+  --color-chalk: #ffffff;
+  --color-chalk-dim: #dddddd;
+  --color-muted: #a8a8a8;
+  --color-faint: #6f6f6f;
+
+  --color-signal: #d7272a; /* WDS red        (--red)      */
+  --color-signal-bright: #f03a3d;
+  --color-signal-dim: #a8181b; /*                (--red-dark) */
+  --color-signal-wash: rgba(215, 39, 42, 0.12);
+
+  /* Movement stays green/red, but "fall" is lifted well clear of the brand
+     red so a dropping fighter never reads as an accent. */
+  --color-rise: #34c17b;
+  --color-fall: #ff6b71;
+  --color-flat: #6f6f6f;
+
+  --font-display: 'Teko', 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --font-sans: 'Oswald', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+
+  --ease-out-fast: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ink-900);
+    color: var(--color-chalk);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    /* Teko carries less weight than Barlow Condensed at the same numeric
+       value, so headings sit at 600 with the half-pixel tracking WDS uses. */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.04;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection {
+    background: var(--color-signal);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+
+  /* Scrollbars kept dark so overflow areas do not flash white. */
+  * {
+    scrollbar-color: var(--color-ink-500) transparent;
+    scrollbar-width: thin;
+  }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-ink-500);
+    border: 3px solid var(--color-ink-900);
+    border-radius: 6px;
+  }
+
+  input, select, textarea, button { font: inherit; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Numerals that carry weight: ranks, ratings, records. */
+  .numeral {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* WDS eyebrows are red and widely tracked — they are the accent's main job
+     on the page, above every section heading. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-signal);
+  }
+
+  /* The accent is dark enough that near-black text on it fails contrast, so
+     anything sitting on a signal fill is white instead. Written as a compound
+     selector so the existing `bg-signal text-ink-900` pairs throughout the app
+     flip without touching a dozen component files. */
+  .bg-signal.text-ink-900 {
+    color: #ffffff;
+  }
+
+  .rule {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .panel {
+    background: var(--color-ink-800);
+    border: 1px solid var(--color-line);
+  }
+
+  .hairline-grid {
+    background-image:
+      linear-gradient(to right, var(--color-line-soft) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-line-soft) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* Full-bleed looping video behind the hero, cropped the way
+     `background-size: cover` would crop an image. The 100vw / 56.25vw pair
+     keeps the 16:9 frame filling the box at any viewport shape — it is the one
+     piece of the WDS hero that CSS utilities cannot express. */
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .hero-video iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw;
+    min-height: 100%;
+    min-width: 177.78vh;
+    transform: translate(-50%, -50%);
+    border: 0;
+    /* Keeps the frame black rather than browser-grey if the embed is blocked. */
+    background: #050505;
+  }
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.25) 55%, rgba(0, 0, 0, 0.6) 100%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
+  }
+
+  /* ------------------------------------------------------------------
+     Light admin surface.
+
+     The admin content area is white while its top bar and sidebar stay
+     black. Rather than rewriting a dozen admin pages, this re-points the
+     same semantic tokens inside that one region: `bg-ink-800` still means
+     "a panel", it is simply a white panel here, and every page, table,
+     button and form follows without a single component change.
+     ------------------------------------------------------------------ */
+  .admin-surface {
+    --color-ink-900: #ffffff; /* the page itself   */
+    --color-ink-850: #f7f7f8; /* tinted card       */
+    --color-ink-800: #ffffff; /* panel             */
+    --color-ink-700: #f1f1f2; /* hover             */
+    --color-ink-600: #e6e6e8;
+    --color-ink-500: #d4d4d7;
+    --color-line: #e3e3e6;
+    --color-line-soft: #eeeef0;
+
+    --color-chalk: #111111; /* primary text      */
+    --color-chalk-dim: #3f3f45;
+    --color-muted: #6a6a72;
+    --color-faint: #9b9ba3;
+
+    /* Movement colours darkened for legibility on white. */
+    --color-rise: #12875a;
+    --color-fall: #c62f34;
+
+    color: var(--color-chalk);
+  }
+
+  /* A modal's backdrop has to stay dark even over a white page, or it
+     stops reading as a veil. Only ink-900 is put back — the dialog on top
+     keeps the light panel colours. */
+  .admin-surface .scrim {
+    --color-ink-900: #050505;
+  }
+
+  /* The WDS card gesture: rise a little, take the accent border. */
+  .lift {
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  .lift:hover {
+    transform: translateY(-6px);
+    border-color: var(--color-signal);
+  }
+
+  .accent-underline {
+    position: relative;
+  }
+  .accent-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--color-signal);
+  }
+}
+
+@layer utilities {
+  .animate-rise {
+    animation: fr-rise 320ms var(--ease-out-fast) both;
+  }
+  .animate-fade {
+    animation: fr-fade 220ms var(--ease-out-fast) both;
+  }
+  .animate-sweep {
+    animation: fr-sweep 520ms var(--ease-out-fast) both;
+  }
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-ink-700) 0%,
+      var(--color-ink-600) 40%,
+      var(--color-ink-700) 80%
+    );
+    background-size: 300% 100%;
+    animation: fr-shimmer 1.4s linear infinite;
+  }
+}
+
+@keyframes fr-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fr-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fr-sweep {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+@keyframes fr-shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -150% 0; }
+}
